@@ -166,6 +166,8 @@ export default class HW2Scene extends Scene {
 		this.receiver.subscribe(HW2Events.CHARGE_CHANGE);
 		this.receiver.subscribe(HW2Events.SHOOT_LASER);
 		this.receiver.subscribe(HW2Events.DEAD);
+		this.receiver.subscribe(HW2Events.AIR_CHANGE);
+		this.receiver.subscribe(HW2Events.HEALTH_CHANGE);
 
 		// Subscribe to laser events
 		this.receiver.subscribe(HW2Events.FIRING_LASER);
@@ -228,6 +230,14 @@ export default class HW2Scene extends Scene {
 			}
 			case HW2Events.CHARGE_CHANGE: {
 				this.handleChargeChange(event.data.get("curchrg"), event.data.get("maxchrg"));
+				break;
+			}
+			case HW2Events.HEALTH_CHANGE: {
+				this.handleHealthChange(event.data.get("curHealth"), event.data.get("maxHealth"));
+				break;
+			}
+			case HW2Events.AIR_CHANGE: {
+				this.handleAirChange(event.data.get("curAir"), event.data.get("maxAir"));
 				break;
 			}
 			case HW2Events.FIRING_LASER: {

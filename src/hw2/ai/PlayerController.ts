@@ -138,9 +138,11 @@ export default class PlayerController implements AI {
 
 		// Player looses a little bit of air each frame
 		this.currentAir = MathUtils.clamp(this.currentAir - deltaT, this.minAir, this.maxAir);
+		this.emitter.fireEvent(HW2Events.AIR_CHANGE, {curAir: this.currentAir, maxAir: this.maxAir});
 
 		// If the player is out of air - start subtracting from the player's health
 		this.currentHealth = this.currentAir <= this.minAir ? MathUtils.clamp(this.currentHealth - deltaT*2, this.minHealth, this.maxHealth) : this.currentHealth;
+		this.emitter.fireEvent(HW2Events.HEALTH_CHANGE, {curHealth: this.currentHealth, maxHealth: this.maxHealth});
 	}
 	/**
 	 * This method handles all events that the reciever for the PlayerController is

@@ -16,6 +16,10 @@ export const HW2Events = {
      */
     CHARGE_CHANGE: "CHARGE_CHANGE",
 
+    HEALTH_CHANGE: "HEALTH_CHANGE",
+
+    AIR_CHANGE: "AIR_CHANGE",
+
     /**
      * The event that gets emitted when the player's health hits 0 (or minhealth)
      * 
