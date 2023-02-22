@@ -493,7 +493,7 @@ export default class HW2Scene extends Scene {
 	 */
 	protected spawnMine(): void {
 		// Find the first visible mine
-		let mine: Sprite = this.mines.find((mine: Sprite) => { return !mine.visible });
+		let mine: AnimatedSprite = this.mines.find((mine: AnimatedSprite) => { return !mine.visible });
 
 		if (mine){
 			// Bring this mine to life
@@ -548,6 +548,27 @@ export default class HW2Scene extends Scene {
 	 */
 	protected spawnBubble(): void {
 		// TODO spawn bubbles!
+		// Find the first visible bubble
+		let bubble: Graphic = this.bubbles.find((bubble: Graphic) => {return !bubble.visible});
+
+		if (bubble) {
+			// Bring this bubble to life
+			bubble.visible = true;
+
+			// Extract the size of the viewport
+			let paddedViewportSize = this.viewport.getHalfSize().scaled(2).add(this.worldPadding);
+			let viewportSize = this.viewport.getHalfSize().scaled(2);	
+			
+			// Loop on position until we're clear of the player
+			bubble.position.copy(RandUtils.randVec(paddedViewportSize.x - viewportSize.x, viewportSize.x, viewportSize.y, viewportSize.y));
+			while(bubble.position.distanceTo(this.player.position) < 100){
+				bubble.position.copy(RandUtils.randVec(paddedViewportSize.x - viewportSize.x, viewportSize.x, viewportSize.y, viewportSize.y))
+			}
+
+			bubble.setAIActive(true, {});
+			// Start the mine spawn timer - spawn a mine every half a second I think
+			this.bubbleSpawnTimer.start(100);			
+		}
 	}
 	/**
 	 * This function takes in a GameNode that may be out of bounds of the viewport and
@@ -746,7 +767,15 @@ export default class HW2Scene extends Scene {
 	 */
 	public handleBubblePlayerCollisions(): number {
 		// TODO check for collisions between the player and the bubbles
-        return;
+		let collisions = 0;
+		for (let bubble of this.bubbles) {
+			if (bubble.visible && 
+				HW2Scene.checkAABBtoCircleCollision
+				(<AABB>this.player.collisionShape, <Circle>bubble.collisionShape))
+				this.emitter.fireEvent(HW2Events.PLAYER_BUBBLE_COLLSION, {id: bubble.id});
+				collisions += 1;
+		}
+        return collisions;
 	}
 
 	/**
@@ -820,7 +849,14 @@ export default class HW2Scene extends Scene {
 	 */
 	public static checkAABBtoCircleCollision(aabb: AABB, circle: Circle): boolean {
         // TODO implement collision detection for AABBs and Circles
-        return;
+		const closestX = MathUtils.clamp(circle.center.x, aabb.center.x, aabb.center.x + 2 * aabb.halfSize.x);
+		const closestY = MathUtils.clamp(circle.center.y, aabb.center.y, aabb.center.y + 2 * aabb.halfSize.y);
+
+		const distanceX = circle.center.x - closestX;
+		const distanceY = circle.center.y - closestY;
+		const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+        return distance <= circle.radius;
 	}
 
     /** Methods for locking and wrapping nodes */

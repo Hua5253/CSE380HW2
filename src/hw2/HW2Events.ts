@@ -9,6 +9,10 @@ export const HW2Events = {
      */
 	PLAYER_MINE_COLLISION: "PLAYER_MINE_COLLISION", 
 
+    PLAYER_BUBBLE_COLLSION: "PLAYER_BUBBLE_COLSION",
+
+    BACK_TO_IDLE: "BACK_TO_IDLE",
+
     /**
      * The event that gets emitted when the charge of the player's laser beam changes
      * 

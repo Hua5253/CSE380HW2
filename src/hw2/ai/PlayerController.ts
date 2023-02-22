@@ -61,6 +61,10 @@ export default class PlayerController implements AI {
 		this.laserTimer = new Timer(2500, this.handleLaserTimerEnd, false);
 		
 		this.receiver.subscribe(HW2Events.SHOOT_LASER);
+		this.receiver.subscribe(HW2Events.PLAYER_MINE_COLLISION);
+		this.receiver.subscribe(HW2Events.PLAYER_BUBBLE_COLLSION);
+		this.receiver.subscribe(HW2Events.BACK_TO_IDLE);
+		this.receiver.subscribe(HW2Events.HEALTH_CHANGE);
 
 		this.activate(options);
 	}
@@ -142,7 +146,9 @@ export default class PlayerController implements AI {
 
 		// If the player is out of air - start subtracting from the player's health
 		this.currentHealth = this.currentAir <= this.minAir ? MathUtils.clamp(this.currentHealth - deltaT*2, this.minHealth, this.maxHealth) : this.currentHealth;
-		this.emitter.fireEvent(HW2Events.HEALTH_CHANGE, {curHealth: this.currentHealth, maxHealth: this.maxHealth});
+		if (this.currentAir <= this.minAir) {
+			this.emitter.fireEvent(HW2Events.HEALTH_CHANGE, {curHealth: this.currentHealth, maxHealth: this.maxHealth});
+		}
 	}
 	/**
 	 * This method handles all events that the reciever for the PlayerController is
@@ -156,6 +162,22 @@ export default class PlayerController implements AI {
 		switch(event.type) {
 			case HW2Events.SHOOT_LASER: {
 				this.handleShootLaserEvent(event);
+				break;
+			}
+			case HW2Events.PLAYER_MINE_COLLISION: {
+				this.handlePlayerMineCollision(event);
+				break;
+			}
+			case HW2Events.PLAYER_BUBBLE_COLLSION: {
+				this.handlePlayerBubbleCollision(event);
+				break;
+			}
+			case HW2Events.BACK_TO_IDLE: {
+				this.handleBackToIdle(event);
+				break;
+			}
+			case HW2Events.HEALTH_CHANGE: {
+				this.handleHealthChange(event);
 				break;
 			}
 			default: {
@@ -177,6 +199,25 @@ export default class PlayerController implements AI {
 	protected handleShootLaserEvent(event: GameEvent): void {
 		this.laserTimer.reset();
 		this.laserTimer.start();
+	}
+
+	protected handlePlayerMineCollision(event: GameEvent): void {
+		this.currentHealth -= 0.3;
+		this.emitter.fireEvent(HW2Events.HEALTH_CHANGE, {curHealth: this.currentHealth, maxHealth: this.maxHealth});
+		this.owner.animation.playIfNotAlready(PlayerAnimations.HIT, false, HW2Events.BACK_TO_IDLE);
+	}
+
+	protected handlePlayerBubbleCollision(event: GameEvent): void {
+		this.currentAir += 1;
+		this.emitter.fireEvent(HW2Events.AIR_CHANGE, {curAir: this.currentAir, maxAir: this.maxAir});
+	}
+
+	protected handleBackToIdle(event: GameEvent): void {
+		this.owner.animation.play(PlayerAnimations.IDLE);
+	}
+
+	protected handleHealthChange(event: GameEvent): void {
+		this.owner.animation.playIfNotAlready(PlayerAnimations.HIT, false, HW2Events.BACK_TO_IDLE);
 	}
 
 	/** 

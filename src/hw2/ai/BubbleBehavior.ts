@@ -3,6 +3,8 @@ import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 import Graphic from "../../Wolfie2D/Nodes/Graphic";
 import MathUtils from "../../Wolfie2D/Utils/MathUtils";
+import Receiver from '../../Wolfie2D/Events/Receiver';
+import { HW2Events } from '../HW2Events';
 
 /**
  * A class that represents the behavior of the bubbles in the HW2Scene
@@ -11,6 +13,7 @@ import MathUtils from "../../Wolfie2D/Utils/MathUtils";
 export default class BubbleBehavior implements AI {
     // The GameNode that owns this behavior
     private owner: Graphic;
+    private receiver: Receiver;
 
     // The current horizontal and vertical speed of the bubble
     private currentXSpeed: number;
@@ -41,6 +44,9 @@ export default class BubbleBehavior implements AI {
         this.minYSpeed = 50;
         this.maxYSpeed = 50;
 
+        this.receiver = new Receiver();
+        this.receiver.subscribe(HW2Events.PLAYER_BUBBLE_COLLSION);
+
         this.activate(options);
     }
 
@@ -52,6 +58,10 @@ export default class BubbleBehavior implements AI {
 
     public handleEvent(event: GameEvent): void {
         switch(event.type) {
+            case HW2Events.PLAYER_BUBBLE_COLLSION: {
+                this.handlePlayerBubbleCollision(event);
+                break;
+            }
             default: {
                 throw new Error("Unhandled event caught in BubbleBehavior! Event type: " + event.type);
             }
@@ -59,6 +69,10 @@ export default class BubbleBehavior implements AI {
     }
 
     public update(deltaT: number): void {   
+        while (this.receiver.hasNextEvent()) {
+            this.handleEvent(this.receiver.getNextEvent());
+        }
+
         // Only update the bubble if it's visible
         if (this.owner.visible) {
             // Increment the speeds
@@ -70,6 +84,14 @@ export default class BubbleBehavior implements AI {
 
             // Update position of the bubble - I'm scaling the Vec2.UP and Vec2.LEFT vectors to move the bubble up and to the left
             this.owner.position.add(Vec2.UP.scale(this.currentYSpeed * deltaT)).add(Vec2.LEFT.scale(this.currentXSpeed* deltaT));
+        }
+    }
+
+    protected handlePlayerBubbleCollision(event: GameEvent): void {
+        let id = event.data.get("id");
+        if (id === this.owner.id) {
+            this.owner.position.copy(Vec2.ZERO);
+            this.owner.visible = false;
         }
     }
     
