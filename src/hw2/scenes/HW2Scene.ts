@@ -615,6 +615,14 @@ export default class HW2Scene extends Scene {
 	 */
 	public handleScreenDespawn(node: CanvasNode): void {
         // TODO - despawn the game nodes when they move out of the padded viewport
+		// Extract the size of the padded viewport
+		let paddedViewportSize = this.viewport.getHalfSize().scaled(2).add(this.worldPadding);
+
+		let halfsize = new Vec2(0.5 * paddedViewportSize.x, 0.5 * paddedViewportSize.y);
+		let aabb = new AABB(this.viewport.getCenter(), halfsize);
+		let position = node.position;
+		if (!aabb.containsPoint(position))
+			node.visible = false;
 	}
 
 	/** Methods for updating the UI */
