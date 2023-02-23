@@ -3,7 +3,7 @@ import { UIElementType } from "../../Wolfie2D/Nodes/UIElements/UIElementTypes";
 import Layer from "../../Wolfie2D/Scene/Layer";
 import Scene from "../../Wolfie2D/Scene/Scene";
 import Color from "../../Wolfie2D/Utils/Color";
-import Homework1_Scene from "./HW2Scene";
+import HW2Scene from "./HW2Scene";
 import Label from "../../Wolfie2D/Nodes/UIElements/Label";
 import GameEvent from "../../Wolfie2D/Events/GameEvent";
 
@@ -102,7 +102,7 @@ export default class MainMenu extends Scene {
         const aboutHeader = <Label>this.add.uiElement(UIElementType.LABEL, MainMenuLayer.ABOUT, {position: new Vec2(center.x, center.y - 250), text: "About"});
         aboutHeader.textColor = Color.WHITE;
 
-        const text1 = "This game was made by <YOUR NAME HERE>, Peter Walsh and Richard McKenna";
+        const text1 = "This game was made by Howard Liu, Peter Walsh and Richard McKenna";
         const text2 = "using the Wolfie2D game engine, a TypeScript game engine created by";
         const text3 = "Joe Weaver and Richard McKenna.";
 
@@ -138,7 +138,7 @@ export default class MainMenu extends Scene {
     protected handleEvent(event: GameEvent): void {
         switch(event.type) {
             case MainMenuEvent.PLAY_GAME: {
-                this.sceneManager.changeToScene(Homework1_Scene, {seed: RandUtils.randomSeed(), recording: true});
+                this.sceneManager.changeToScene(HW2Scene, {seed: RandUtils.randomSeed(), recording: true});
                 break;
             }
             case MainMenuEvent.CONTROLS: {
@@ -159,6 +159,7 @@ export default class MainMenu extends Scene {
             }
             case MainMenuEvent.PLAY_RECORDING: {
                 // TODO play the recording here
+
                 break;
             }
             default: {

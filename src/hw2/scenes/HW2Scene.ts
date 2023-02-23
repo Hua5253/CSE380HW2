@@ -67,6 +67,8 @@ export default class HW2Scene extends Scene {
     // The seed that should be set before the game starts
     private seed: string;
 
+	private basicRecording: BasicRecording;
+
 	// Sprites for the background images
 	private bg1: Sprite;
 	private bg2: Sprite;
@@ -115,7 +117,9 @@ export default class HW2Scene extends Scene {
 	 */
 	public override initScene(options: Record<string, any>): void {
 		this.seed = options.seed === undefined ? RandUtils.randomSeed() : options.seed;
+		// console.log(this.seed);
         this.recording = options.recording === undefined ? false : options.recording; 
+		this.basicRecording = new BasicRecording(HW2Scene);
 	}
 	/**
 	 * @see Scene.loadScene()
@@ -171,6 +175,8 @@ export default class HW2Scene extends Scene {
 
 		// Subscribe to laser events
 		this.receiver.subscribe(HW2Events.FIRING_LASER);
+
+		this.emitter.fireEvent(GameEventType.START_RECORDING, {recording: this.basicRecording, seed: this.seed});
 	}
 	/**
 	 * @see Scene.updateScene 
@@ -191,6 +197,9 @@ export default class HW2Scene extends Scene {
 
 		// Handle timers
 		this.handleTimers();
+
+		this.wrapPlayer(this.player, this.viewport.getCenter(), this.viewport.getHalfSize());
+		this.lockPlayer(this.player, this.viewport.getCenter(), this.viewport.getHalfSize());
 
         // TODO Remove despawning of mines and bubbles here
 
@@ -915,6 +924,18 @@ export default class HW2Scene extends Scene {
 	 */
 	protected wrapPlayer(player: CanvasNode, viewportCenter: Vec2, viewportHalfSize: Vec2): void {
 		// TODO wrap the player around the top/bottom of the screen
+		const playerPosition = player.position; // get the position of the player
+		const paddedTop = viewportCenter.y - viewportHalfSize.y;
+		const paddedBottom = viewportCenter.y + viewportHalfSize.y;
+
+		if (playerPosition.y > paddedBottom) {
+			playerPosition.y = paddedTop;
+		} 
+		if (playerPosition.y < paddedTop) {
+			playerPosition.y = paddedBottom;
+		}
+	
+		player.position = playerPosition;
 	}
 
     /**
@@ -958,6 +979,18 @@ export default class HW2Scene extends Scene {
 	 */
 	protected lockPlayer(player: CanvasNode, viewportCenter: Vec2, viewportHalfSize: Vec2): void {
 		// TODO prevent the player from moving off the left/right side of the screen
+		// Calculate the left and right edges of the viewport
+		const viewportLeft = viewportCenter.x - viewportHalfSize.x;
+		const viewportRight = viewportCenter.x + viewportHalfSize.x;
+		
+		const playerLeft = player.position.x - player.size.x / 2;
+		const playerRight = player.position.x + player.size.x / 2;
+		
+		if (playerLeft < viewportLeft) {
+			player.position.x = viewportLeft + player.size.x / 2;
+		} else if (playerRight > viewportRight) {
+			player.position.x = viewportRight - player.size.x / 2;
+		}
 	}
 
 	public handleTimers(): void {
