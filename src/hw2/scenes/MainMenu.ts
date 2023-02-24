@@ -159,7 +159,8 @@ export default class MainMenu extends Scene {
             }
             case MainMenuEvent.PLAY_RECORDING: {
                 // TODO play the recording here
-
+                console.log("play recoridng");
+                this.emitter.fireEvent(GameEventType.PLAY_RECORDING);
                 break;
             }
             default: {

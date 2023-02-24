@@ -10,6 +10,7 @@ import MathUtils from "../../Wolfie2D/Utils/MathUtils";
 
 import { HW2Events } from "../HW2Events";
 import { HW2Controls } from "../HW2Controls";
+import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 
 export const PlayerAnimations = {
     IDLE: "IDLE",
@@ -45,6 +46,8 @@ export default class PlayerController implements AI {
 	// A receiver and emitter to hook into the event queue
 	private receiver: Receiver;
 	private emitter: Emitter;
+
+	private isDeadEventFired: boolean = false;
 
 	/**
 	 * This method initializes all variables inside of this AI class.
@@ -120,8 +123,12 @@ export default class PlayerController implements AI {
 
         // If the player is out of hp - play the death animation
 		if (this.currentHealth <= this.minHealth) { 
-            this.emitter.fireEvent(HW2Events.DEAD);
+			if (!this.isDeadEventFired) {
+				this.emitter.fireEvent(HW2Events.DEAD);
+			}
+            this.isDeadEventFired = true;
 			this.owner.animation.play(PlayerAnimations.DEATH);
+			this.emitter.fireEvent(GameEventType.STOP_RECORDING);
             return;
         }
 
