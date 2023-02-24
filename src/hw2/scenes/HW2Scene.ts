@@ -980,16 +980,16 @@ export default class HW2Scene extends Scene {
 	protected lockPlayer(player: CanvasNode, viewportCenter: Vec2, viewportHalfSize: Vec2): void {
 		// TODO prevent the player from moving off the left/right side of the screen
 		// Calculate the left and right edges of the viewport
-		const viewportLeft = viewportCenter.x - viewportHalfSize.x;
-		const viewportRight = viewportCenter.x + viewportHalfSize.x;
+		const viewportLeft = viewportCenter.x - viewportHalfSize.x + player.size.x / 4.4;
+		const viewportRight = viewportCenter.x + viewportHalfSize.x - player.size.x / 4.4;
 		
-		const playerLeft = player.position.x - player.size.x / 2;
-		const playerRight = player.position.x + player.size.x / 2;
+		const playerLeft = player.position.x;
+		const playerRight = player.position.x;
 		
 		if (playerLeft < viewportLeft) {
-			player.position.x = viewportLeft + player.size.x / 2;
+			player.position.x = viewportLeft;
 		} else if (playerRight > viewportRight) {
-			player.position.x = viewportRight - player.size.x / 2;
+			player.position.x = viewportRight;
 		}
 	}
 
