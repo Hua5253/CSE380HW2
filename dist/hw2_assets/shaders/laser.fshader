@@ -51,8 +51,8 @@ void main(){
 
 // TODO Get the laser to look like a sinwave
 float sinwave_laser(vec4 position) {
-    float distance = abs(position.y - 0.015 * sin(position.x * 70.0));
-    float alpha = 1.0 - distance / 0.015;
+    float distance = abs(position.y - 0.011 * sin(position.x * 70.0));
+    float alpha = 1.0 - distance / 0.011;
 
     return alpha;
 }
